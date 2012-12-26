@@ -5,8 +5,8 @@ class ssl::params {
        $ssl_path = '/etc/pki'
     }
     'ubuntu', 'debian': {
-       $ssl_path = '/etc/ssl/'
+       $ssl_path = '/etc/ssl'
     }
-    default: { $ssl_path = '/etc/ssl/' }
+    default: { $ssl_path = '/etc/ssl' }
   }
 }
