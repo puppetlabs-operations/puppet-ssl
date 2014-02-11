@@ -1,21 +1,39 @@
-puppet-ssl
-==========
+# SSL
 
-Define common ssl data and configuration
+Define common SSL data and configuration
 
 This is primarily an entry point for platform agnostic SSL data.
 
-hiera
------
+## Usage
+
+To simply mange the directories associated with SSL on a given system, just
+include the `ssl` class.
+
+``` Puppet
+include ssl
+```
+
+If you have a module that needs to use these SSL directories, you can simply reference the variables using the full name.
+
+``` Puppet
+$ssl::ssl_dir
+```
+
+This is useful if you want to deploy certs, or just have a more consistent, repeatable SSL deployment.
+
+
+## hiera
+
+This module was using the `hiera()` finctions to do the lookup that has now been replaced with the `ssl::params` class.  Now to support new platforms, you just need extend the `ssl::params` class.  What follows is being deprecated and should no longer be used.  **PLEASE UPDATE YOUR MANIFESTS**.
+
+### Deprecated hiera usage
 
 Hiera is the main place to inject data into this module. To make it work out of
 the box you'll need to have the following hierarchy, or something equivalent:
 
-
     ----
     hierarchy:
       - %{osfamily}
-
 
 You'll also need the following files:
 
