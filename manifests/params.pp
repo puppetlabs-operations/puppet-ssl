@@ -37,8 +37,8 @@ class ssl::params {
   # We should prepare to deprecate these first few variables
   warning('hiera calls in the ssl module are being deprecated.  Please update your manifests to use hte variables from the ssl class.')
   $ssl_path       = $ssl_dir
-  $ssl_cert_file  = hiera('ssl::params::ssl_cert_file')
-  $ssl_chain_file = hiera('ssl::params::ssl_chain_file')
-  $ssl_key_file   = hiera('ssl::params::ssl_key_file')
-  $ssl_ciphers    = hiera('ssl::params::ssl_ciphers')
+  $ssl_cert_file  = hiera('ssl::params::ssl_cert_file', undef)
+  $ssl_chain_file = hiera('ssl::params::ssl_chain_file', undef)
+  $ssl_key_file   = hiera('ssl::params::ssl_key_file', undef)
+  $ssl_ciphers    = hiera('ssl::params::ssl_ciphers', undef)
 }
