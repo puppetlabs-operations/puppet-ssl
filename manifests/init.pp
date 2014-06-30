@@ -34,6 +34,7 @@ class ssl {
 
   file { $ssl_keydir:
     ensure => directory,
-    mode   => '0710',
+    group  => 'ssl-cert',
+    mode   => '0750',
   }
 }
