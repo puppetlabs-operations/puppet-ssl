@@ -32,6 +32,10 @@ class ssl {
     mode   => '0755',
   }->
 
+  group { 'ssl-cert':
+    ensure => 'present'
+  }->
+
   file { $ssl_keydir:
     ensure => directory,
     group  => 'ssl-cert',
