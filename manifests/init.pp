@@ -33,7 +33,7 @@ class ssl {
   }->
 
   group { 'ssl-cert':
-    ensure => present
+    ensure => 'present'
   }->
 
   file { $ssl_keydir:
