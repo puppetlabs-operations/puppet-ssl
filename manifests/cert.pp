@@ -82,17 +82,17 @@ define ssl::cert (
       concat { $unified_cert:
         ensure => 'present',
       }
-      concat::fragment{ 'server_cert':
+      concat::fragment{ "${name}_server_cert":
         target => $unified_cert,
         source => "${source}/${certfile}",
         order  => '1'
       }
-      concat::fragment{ 'server_key':
+      concat::fragment{ "${name}_server_key":
         target => $unified_cert,
         source => "${source}/${keyfile}",
         order  => '2'
       }
-      concat::fragment{ 'intermediate_cert':
+      concat::fragment{ "${name}_intermediate_cert":
         target => $unified_cert,
         source => "${source}/${certinterfile}",
         order  => '3'
@@ -103,12 +103,12 @@ define ssl::cert (
       concat { $unified_cert:
         ensure => present,
       }
-      concat::fragment{ 'server_cert':
+      concat::fragment{ "${name}_server_cert":
         target => $unified_cert,
         source => "${source}/${certfile}",
         order  => '1'
       }
-      concat::fragment{ 'intermediate_cert':
+      concat::fragment{ "${name}_intermediate_cert":
         target => $unified_cert,
         source => "${source}/${certinterfile}",
         order  => '2'
