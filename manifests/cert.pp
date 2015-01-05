@@ -76,6 +76,10 @@ define ssl::cert (
     mode  => $mode,
   }
 
+  Concat {
+    ensure_newline => true,
+  }
+
   case $concat {
     'haproxy': { ## combine cert, key, and intermediate cert files
       $unified_cert = "${certdir}/${certfile}"
