@@ -47,7 +47,7 @@ define ssl::cert (
   $concat        = false,
   $user          = 'root',
   $group         = 'root',
-  $mode          = '0644',
+  $mode          = '0640',
   ) {
   include ssl
   include ssl::params
