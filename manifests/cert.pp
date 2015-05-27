@@ -108,7 +108,6 @@ define ssl::cert (
           target  => $unified_cert,
           source  => $dhkey_file,
           order   => '4',
-          require => Class['ssl'],
         }
       }
     }
