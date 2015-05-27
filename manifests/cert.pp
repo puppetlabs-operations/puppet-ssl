@@ -41,6 +41,7 @@ define ssl::cert (
   $certchainfile = "${name}_chain.crt",
   $certinterfile = "${name}_inter.crt",
   $keyfile       = "${name}.key",
+  $dhkey_file    = $::ssl::dhkey_path,
   $source        = "puppet://${::secure_server}/modules/ssldata",
   $dest_certdir  = '',
   $dest_keydir   = '',
@@ -48,6 +49,7 @@ define ssl::cert (
   $user          = 'root',
   $group         = 'root',
   $mode          = '0640',
+  $manage_dhkey  = true,
   ) {
   include ssl
   include ssl::params
@@ -100,6 +102,14 @@ define ssl::cert (
         target => $unified_cert,
         source => "${source}/${certinterfile}",
         order  => '3'
+      }
+      if $manage_dhkey {
+        concat::fragment{ "${name}_dhkey":
+          target  => $unified_cert,
+          source  => $dhkey_file,
+          order   => '4',
+          require => Class['ssl'],
+        }
       }
     }
     'nginx': { ## append intermediate CA cert to server cert, also deploy key

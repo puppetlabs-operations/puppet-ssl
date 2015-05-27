@@ -41,4 +41,14 @@ class ssl {
     group  => 'ssl-cert',
     mode   => '0750',
   }
+
+  $dhkey_file = "dhkey2048.pem"
+  $dhkey_path = "${ssl_keydir}/${dhkey_file}"
+
+  exec { "generate dhkey":
+    command => "openssl dhparam -out ${dhkey_file} -5 2048",
+    cwd     => $ssl_keydir,
+    creates => $dhkey_path,
+    require => File[$ssl_keydir],
+  }
 }
