@@ -64,11 +64,7 @@ define ssl::cert (
     $keydir = $dest_keydir
   }
 
-  if $::is_pe == true {
-    $secure_server = hiera('pe_caserver')
-  } else {
-    $secure_server  = hiera('puppetlabs::ssl::secure_server', $::caserver)
-  }
+  $secure_server  = hiera('puppetlabs::ssl::secure_server', $::caserver)
 
   File {
     owner => $user,
