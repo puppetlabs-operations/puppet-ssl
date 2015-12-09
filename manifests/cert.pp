@@ -41,7 +41,7 @@ define ssl::cert (
   $certchainfile = "${name}_chain.crt",
   $certinterfile = "${name}_inter.crt",
   $keyfile       = "${name}.key",
-  $source        = "puppet://${::secure_server}/modules/ssldata",
+  $source        = false,
   $dest_certdir  = '',
   $dest_keydir   = '',
   $concat        = false,
@@ -66,6 +66,13 @@ define ssl::cert (
 
   $secure_server  = hiera('puppetlabs::ssl::secure_server', $::caserver)
 
+  if $source == false {
+    $source_base = "puppet://${secure_server}/modules/ssldata"
+  }
+  else {
+    $source_base = $source
+  }
+
   File {
     owner => $user,
     group => $group,
@@ -84,17 +91,17 @@ define ssl::cert (
       }
       concat::fragment{ "${name}_server_cert":
         target => $unified_cert,
-        source => "${source}/${certfile}",
+        source => "${source_base}/${certfile}",
         order  => '1'
       }
       concat::fragment{ "${name}_server_key":
         target => $unified_cert,
-        source => "${source}/${keyfile}",
+        source => "${source_base}/${keyfile}",
         order  => '2'
       }
       concat::fragment{ "${name}_intermediate_cert":
         target => $unified_cert,
-        source => "${source}/${certinterfile}",
+        source => "${source_base}/${certinterfile}",
         order  => '3'
       }
     }
@@ -105,44 +112,44 @@ define ssl::cert (
       }
       concat::fragment{ "${name}_server_cert":
         target => $unified_cert,
-        source => "${source}/${certfile}",
+        source => "${source_base}/${certfile}",
         order  => '1'
       }
       concat::fragment{ "${name}_intermediate_cert":
         target => $unified_cert,
-        source => "${source}/${certinterfile}",
+        source => "${source_base}/${certinterfile}",
         order  => '2'
       }
 
       # Deploy the key
       file { "${keydir}/${keyfile}":
-        source => "${source}/${keyfile}",
+        source => "${source_base}/${keyfile}",
         mode   => '0400',
       }
     }
     default: { ## deploy SSL-related files individually
       # Deploy the certificate
       file { "${certdir}/${certfile}":
-        source => "${source}/${certfile}",
+        source => "${source_base}/${certfile}",
       }
 
       # Deploy the key
       file { "${keydir}/${keyfile}":
-        source => "${source}/${keyfile}",
+        source => "${source_base}/${keyfile}",
         mode   => '0400',
       }
 
       # Deploy the chain certificate
       if($certchainfile != '') {
         file { "${certdir}/${certchainfile}":
-          source => "${source}/${certchainfile}",
+          source => "${source_base}/${certchainfile}",
         }
       }
 
       # Deploy the intermedia CA cert
       if($certinterfile != '') {
         file { "${certdir}/${certinterfile}":
-          source => "${source}/${certinterfile}",
+          source => "${source_base}/${certinterfile}",
         }
       }
     }
