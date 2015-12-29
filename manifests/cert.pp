@@ -49,8 +49,8 @@ define ssl::cert (
   $group         = 'root',
   $mode          = '0640',
   ) {
-  include ssl
-  include ssl::params
+  include ::ssl
+  include ::ssl::params
 
   if $dest_certdir == '' {
     $certdir = $::ssl::params::ssl_certdir
