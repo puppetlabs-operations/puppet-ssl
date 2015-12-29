@@ -81,6 +81,9 @@ define ssl::cert (
 
   Concat {
     ensure_newline => true,
+    owner => $user,
+    group => $group,
+    mode  => $mode,
   }
 
   case $concat {
@@ -88,6 +91,7 @@ define ssl::cert (
       $unified_cert = "${certdir}/${certfile}"
       concat { $unified_cert:
         ensure => 'present',
+        mode   => '0400',
       }
       concat::fragment{ "${name}_server_cert":
         target => $unified_cert,
