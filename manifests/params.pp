@@ -4,21 +4,21 @@
 #
 class ssl::params {
   case $::osfamily {
-    'debian': {
+    'Debian': {
       $ssl_dir              = '/etc/ssl'
       $ssl_certdir          = "${ssl_dir}/certs"
       $ssl_keydir           = "${ssl_dir}/private"
       $ssl_default_certpath = "${ssl_certdir}/ssl-cert-snakeoil.pem"
       $ssl_default_keypath  = "${ssl_keydir}/ssl-cert-snakeoil.key"
     }
-    'redhat': {
+    'RedHat': {
       $ssl_dir              = '/etc/pki'
       $ssl_certdir          = "${ssl_dir}/certs"
       $ssl_keydir           = "${ssl_dir}/private"
       $ssl_default_certpath = "${ssl_certdir}/localhost.crt"
       $ssl_default_keypath  = "${ssl_keydir}/localhost.key"
     }
-    'freebsd': {
+    'FreeBSD': {
       $ssl_dir              = '/etc/ssl'
       $ssl_certdir          = "${ssl_dir}/certs"
       $ssl_keydir           = "${ssl_dir}/private"
