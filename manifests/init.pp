@@ -3,7 +3,9 @@
 # This class maintains the permissions of the various directories used for SSL
 # deployments.
 #
-class ssl {
+class ssl (
+  Boolean $manage_ssl_dir = true
+) {
 
   include ssl::params
 
@@ -22,23 +24,25 @@ class ssl {
     group => '0',
   }
 
-  file { $ssl_dir:
-    ensure => directory,
-    mode   => '0755',
-  }->
+  if $manage_ssl_dir {
+    file { $ssl_dir:
+      ensure => directory,
+      mode   => '0755',
+    }->
 
-  file { $ssl_certdir:
-    ensure => directory,
-    mode   => '0755',
-  }->
+    file { $ssl_certdir:
+      ensure => directory,
+      mode   => '0755',
+    }->
 
-  group { 'ssl-cert':
-    ensure => 'present'
-  }->
+    group { 'ssl-cert':
+      ensure => 'present'
+    }->
 
-  file { $ssl_keydir:
-    ensure => directory,
-    group  => 'ssl-cert',
-    mode   => '0750',
+    file { $ssl_keydir:
+      ensure => directory,
+      group  => 'ssl-cert',
+      mode   => '0750',
+    }
   }
 }
