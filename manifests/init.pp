@@ -28,21 +28,23 @@ class ssl (
     file { $ssl_dir:
       ensure => directory,
       mode   => '0755',
-    }->
-
-    file { $ssl_certdir:
-      ensure => directory,
-      mode   => '0755',
-    }->
-
-    group { 'ssl-cert':
-      ensure => 'present'
-    }->
-
-    file { $ssl_keydir:
-      ensure => directory,
-      group  => 'ssl-cert',
-      mode   => '0750',
     }
+  }
+
+  file { $ssl_certdir:
+    ensure  => directory,
+    mode    => '0755',
+    require => File["${ssl_dir}"],
+  }
+
+  group { 'ssl-cert':
+    ensure => 'present'
+  }
+
+  file { $ssl_keydir:
+    ensure  => directory,
+    group   => 'ssl-cert',
+    mode    => '0750',
+    require => Group['ssl-cert'],
   }
 }
