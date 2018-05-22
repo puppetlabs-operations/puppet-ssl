@@ -1,74 +1,58 @@
-# SSL
+# Manage SSL certificates and keys
 
-Define common SSL data and configuration
+The primary purpose of this module is to install certificatess and keys in a few
+common formats.
 
-This is primarily an entry point for platform agnostic SSL data.
+## Storing certificates and keys
 
-## Usage
+This requires that certificates and keys are stored separately. Keys should be
+stored in hiera, while files must be stored in the `files/` directory of one of
+your profiles.
 
-To simply mange the directories associated with SSL on a given system, just
-include the `ssl` class. This module can also deploy SSL certificates from
-your master to nodes, including combining them as haproxy and nginx prefer.
+The primary certificate must be named "name.crt", and the intermediate
+certificate must be name "name_inter.crt". For example, if you store your files
+in `profile::ssl`:
 
-To simply manage directories:
-``` Puppet
-include ssl
-```
+    site/profile/files/ssl/puppet.com.crt
+    site/profile/files/ssl/puppet.com_inter.crt
+    site/profile/files/ssl/forge.puppet.com.crt
+    site/profile/files/ssl/forge.puppet.com_inter.crt
 
-If you have a module that needs to use these SSL directories, you can simply reference the variables using the full name.
+Set the profile to use in hiera, or by setting the `cert_source` parameter
+directly on the `ssl` class. The value should be in the same format as the
+`file()` function expects, e.g. `'profile/ssl'`.
 
-``` Puppet
-$ssl::ssl_dir
-```
+The private keys for your certificates go into Hiera as entries in the
+`ssl::keys` hash. We recommend encrypting them with [Hiera eyaml][]. To continue
+with the example from above:
 
-This is useful if you want to deploy certs, or just have a more consistent, repeatable SSL deployment.
+    ssl::cert_source: 'profile/ssl'
+    ssl::keys:
+      'puppet.com': ENC[PKCS7,MIIH...
+      'forge.puppet.com': ENC[PKCS7,MIIH...
 
-To have this module deploy a certificate:
-``` Puppet
-include ssl
-ssl::cert {'puppetlabs_wildcard': }
-```
-This will copy `puppetlabs_wildcard.crt`, `puppetlabs_wildcard.key`,
-`puppetlabs_wildcard_chain.crt`, and `puppetlabs_wildcard_inter.crt` to
-`ssl::params::ssl_certdir`.
+## Deploying certificates and keys
 
-If you're using haproxy, these certs can be combined into one file:
-``` Puppet
-include ssl
-ssl::cert {'puppetlabs_wildcard':
-  concat => 'haproxy',
-}
-```
+### `ssl::cert`
 
-More examples are provided in manifests/cert.pp.
+This is the most generic resource. It stores keys in the default global
+certificate and key directories for your OS.
 
-## hiera
+On Debian, the `puppet.com` cert would be deployed as follows:
 
-This module was using the `hiera()` functions to do the lookup that has now been replaced with the `ssl::params` class.  Now to support new platforms, you just need extend the `ssl::params` class.  What follows is being deprecated and should no longer be used.  **PLEASE UPDATE YOUR MANIFESTS**.
+    /etc/ssl/certs/puppet.com.crt
+    /etc/ssl/certs/puppet.com_inter.crt
+    /etc/ssl/certs/puppet.com_combined.crt
+    /etc/ssl/private/puppet.com.key
 
-### Deprecated hiera usage
+The `_combined.crt` file is concatenation of the primary certificate followed by
+the intermediate certificate. This is the format used by NGINX and a variety of
+other applications.
 
-Hiera is the main place to inject data into this module. To make it work out of
-the box you'll need to have the following hierarchy, or something equivalent:
+### `ssl::cert::haproxy`
 
-    ----
-    hierarchy:
-      - %{osfamily}
+This combines certificates with their key in the format expected by HAProxy. By
+default, it puts them in `/etc/haproxy/certs.d/${key_name}.crt`.
 
-You'll also need the following files:
 
-    ----
-    # hiera_dir/Debian.yaml
-    ssl::params::ssl_path: '/etc/ssl'
-    ssl::params::ssl_cert_file: %{ssl_path}/certs/ssl-cert-snakeoil.pem
-    ssl::params::ssl_key_file: %{ssl_path}/private/ssl-cert-snakeoil.key
-
-- - -
-
-    ---
-    # hiera_dir/RedHat.yaml
-    ssl::params::ssl_path: '/etc/pki'
-    ssl::params::ssl_cert_file: %{ssl_path}/tls/certs/localhost.crt
-    ssl::params::ssl_key_file: %{ssl_path}/tls/private/localhost.key
-
-This will set up the system to use the system's self signed ssl certs.
+[Hiera eyaml]: https://github.com/voxpupuli/hiera-eyaml
