@@ -4,7 +4,9 @@ class ssl::params {
     'Debian'  => '/etc/ssl',
     'RedHat'  => '/etc/pki',
     'FreeBSD' => '/etc/ssl',
-    default   => fail("ssl module doesn't support OS family ${facts['os']['family']}"),
+    # This will not work on various platforms, e.g. Windows, but it's important
+    # that this not fail so that ssl::cert works on those platforms.
+    default   => '/etc/ssl',
   }
 
   $cert_dir = "${ssl_dir}/certs"
