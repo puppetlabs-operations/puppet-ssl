@@ -15,50 +15,67 @@
 #       'puppet.com': ENC[PKCS7,MIIH...
 #       'forge.puppet.com': ENC[PKCS7,MIIH...
 #
-# The two most important parameters are:
+# The most important parameters are:
 #
 #   $cert_source - Where to find cert files with the file() function.
 #   $keys - Private keys indexed by key names.
+#   $manage_dirs - Whether or not to manage the ssl_dir, cert_dir, and key_dir
+#     with Puppet. This also determines whether or not we create the ssl-cert
+#     group.
 class ssl (
   String[1]                  $cert_source,
-  Hash[String[1], String[1]] $keys           = {},
-  Boolean                    $manage_ssl_dir = true,
-) {
-  # This doesn't quite follow the params pattern. Unfortunately, we have code
-  # that relies on variables in ssl::params, but doesn't actually need the
-  # directories managed. This is the simplest way to handle that legacy code.
-  #
-  # The PR I'm currently working on is getting too big, so I will leave
-  # refactoring this to a future change.
-  include ssl::params
-  $ssl_dir = $ssl::params::ssl_dir
-  $cert_dir = $ssl::params::cert_dir
-  $key_dir = $ssl::params::key_dir
+  Hash[String[1], String[1]] $keys             = {},
+  Boolean                    $manage_dirs      = true,
+  Boolean                    $manage_ssl_dir   = $manage_dirs,
+  Stdlib::Absolutepath       $ssl_dir          = $ssl::params::ssl_dir,
+  Stdlib::Absolutepath       $cert_dir         = "${ssl_dir}/certs",
+  Stdlib::Absolutepath       $key_dir          = "${ssl_dir}/keys",
+  Optional[String[1]]        $owner            = $ssl::params::owner,
+  Optional[String[1]]        $group            = $ssl::params::group,
+  Boolean                    $manage_group     = $group != undef,
+  Optional[String[1]]        $public_dir_mode  = $ssl::params::public_dir_mode,
+  Optional[String[1]]        $key_dir_mode     = $ssl::params::key_dir_mode,
+  Optional[String[1]]        $public_file_mode = $ssl::params::public_file_mode,
+  Optional[String[1]]        $key_file_mode    = $ssl::params::key_file_mode,
+  Boolean                    $manage_acl       = $ssl::params::manage_acl,
+) inherits ssl::params {
 
   if $manage_ssl_dir {
     file { $ssl_dir:
       ensure => directory,
-      owner  => 'root',
-      group  => '0',
-      mode   => '0755',
+      owner  => $owner,
+      group  => $group,
+      mode   => $public_dir_mode,
     }
   }
 
-  file { $cert_dir:
-    ensure => directory,
-    owner  => 'root',
-    group  => '0',
-    mode   => '0755',
+  if $manage_group {
+    group { $group:
+      ensure => present,
+    }
   }
 
-  group { 'ssl-cert':
-    ensure => present,
+  if $manage_dirs {
+    file {
+      default:
+        ensure => directory,
+        owner  => $owner,
+        group  => $group,
+      ;
+      $cert_dir:
+        mode => $public_dir_mode,
+      ;
+      $key_dir:
+        mode => $key_dir_mode,
+      ;
+    }
   }
 
-  file { $key_dir:
-    ensure => directory,
-    owner  => 'root',
-    group  => 'ssl-cert',
-    mode   => '0750',
+  if $facts['os']['family'] == 'windows' {
+    class { 'ssl::windows':
+      ssl_dir    => $ssl_dir,
+      key_dir    => $key_dir,
+      manage_acl => $manage_acl,
+    }
   }
 }

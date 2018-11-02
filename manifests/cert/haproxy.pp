@@ -1,5 +1,7 @@
 # Install key and certs combination for HAProxy.
 #
+# This is not supported on Windows.
+#
 # See the README for information about how to store certificates and keys for
 # use by this type.
 #

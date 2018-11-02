@@ -1,3 +1,4 @@
+# Not supported on Windows
 define ssl::hashfile(
   $certdir,
 ) {

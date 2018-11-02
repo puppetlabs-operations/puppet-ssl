@@ -4,11 +4,34 @@ class ssl::params {
     'Debian'  => '/etc/ssl',
     'RedHat'  => '/etc/pki',
     'FreeBSD' => '/etc/ssl',
-    # This will not work on various platforms, e.g. Windows, but it's important
-    # that this not fail so that ssl::cert works on those platforms.
+    'windows' => 'C:/ProgramData/ssl',
+    # This will not work on various platforms, but it's important that this will
+    # not fail so that ssl::cert works on those platforms.
     default   => '/etc/ssl',
   }
 
+  if $facts['os']['family'] == 'windows' {
+    # Use ACLs explicitly on Windows
+    $manage_acl       = true
+    $owner            = undef
+    $group            = undef
+    $public_dir_mode  = undef
+    $key_dir_mode     = undef
+    $public_file_mode = undef
+    $key_file_mode    = undef
+  } else {
+    $manage_acl       = false
+    $owner            = 'root'
+    $group            = 'ssl-cert'
+    $public_dir_mode  = '0755'
+    $key_dir_mode     = '0750'
+    $public_file_mode = '0640'
+    $key_file_mode    = '0400'
+  }
+
+  # This doesn't quite follow the params pattern. Unfortunately, we have code
+  # that relies on these variables, but doesn't actually need the directories
+  # managed. This is the simplest way to handle that legacy code.
   $cert_dir = "${ssl_dir}/certs"
   $key_dir = "${ssl_dir}/private"
 

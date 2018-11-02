@@ -1,6 +1,6 @@
 {
   "name": "puppet-ssl",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "InfraCore at Puppet",
   "summary": "Manage SSL certificates and keys",
   "license": "Apache-2.0",
@@ -72,6 +72,15 @@
       "operatingsystem": "Solaris",
       "operatingsystemrelease": [
         "11"
+      ]
+    },
+    {
+      "operatingsystem": "windows",
+      "operatingsystemrelease": [
+        "2008 R2",
+        "2012 R2",
+        "10",
+        "2016"
       ]
     }
   ],
