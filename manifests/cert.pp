@@ -21,7 +21,7 @@ define ssl::cert (
   include ssl
 
   $_cert_dir = pick($cert_dir, $ssl::cert_dir)
-  $_key_dir = pick($_key_dir, $ssl::key_dir)
+  $_key_dir = pick($key_dir, $ssl::key_dir)
 
   file {
     default:
